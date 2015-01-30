@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class SpawnOnClick : MonoBehaviour {
@@ -9,8 +9,11 @@ public class SpawnOnClick : MonoBehaviour {
 
 	GameObject curObject;
 
+//	public LayerMask mask;
+
 	void Start () {
 		curObject = (GameObject)Instantiate (spawnables [curSelection]);
+		SetLayer("Ignore Raycast");
 	}
 	
 	void Update () {
@@ -18,18 +21,20 @@ public class SpawnOnClick : MonoBehaviour {
 			curSelection--;
 			if(curSelection < 0) {
 				curSelection = spawnables.Length - 1;
-				Destroy(curObject);
-				curObject = (GameObject)Instantiate (spawnables [curSelection]);
 			}
+			Destroy(curObject);
+			curObject = (GameObject)Instantiate (spawnables [curSelection]);
+			SetLayer("Ignore Raycast");
 		}
 
 		if (Input.GetKeyDown (KeyCode.E)) {
 			curSelection++;
 			if(curSelection > spawnables.Length - 1) {
 				curSelection = 0;
-				Destroy(curObject);
-				curObject = (GameObject)Instantiate (spawnables [curSelection]);
 			}
+			DestroyImmediate(curObject);
+			curObject = (GameObject)Instantiate (spawnables [curSelection]);
+			SetLayer("Ignore Raycast");
 		}
 
 		RaycastHit hit;
@@ -37,9 +42,18 @@ public class SpawnOnClick : MonoBehaviour {
 			curObject.transform.position = hit.point;
 
 			if (Input.GetButtonDown ("Fire1")) {
+				SetLayer("Default");
 				curObject.transform.parent = hit.transform.parent;
-				curObject = (GameObject)Instantiate (spawnables [curSelection]);
+				curObject = (GameObject)Instantiate (spawnables [curSelection], hit.point, Quaternion.identity);
+				SetLayer("Ignore Raycast");
 			}
+		}
+	}
+
+	void SetLayer(string layer) {
+		curObject.layer = LayerMask.NameToLayer (layer);
+		foreach (Transform obj in curObject.GetComponentsInChildren<Transform>()) {
+			obj.gameObject.layer = LayerMask.NameToLayer (layer);
 		}
 	}
 }
