@@ -36,9 +36,9 @@ public class SpawnOnClick : MonoBehaviour {
 			curObject = (GameObject)Instantiate (spawnables [curSelection]);
 			SetLayer("Ignore Raycast");
 		}
-
+		Camera cam = GetComponentInChildren<Camera> ();
 		RaycastHit hit;
-		if (Physics.Raycast (Camera.main.ScreenPointToRay (Input.mousePosition), out hit)) {
+		if (Physics.Raycast (cam.ScreenPointToRay (new Vector3(Screen.width/2f,Screen.height/2f)), out hit)) {
 			curObject.transform.position = hit.point;
 
 			if (Input.GetButtonDown ("Fire1")) {
